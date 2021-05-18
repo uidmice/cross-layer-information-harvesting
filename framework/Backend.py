@@ -13,6 +13,10 @@ class Application:
         for i in range(num_nodes):
             self.record[i] = [0]
 
+    def app_init(self, init_values):
+        for i in self.record:
+            self.record[i][-1] = init_values[i]
+
     def run(self, info):
         temp = info.payload['value']
         self.record[info.node_id].append(temp)

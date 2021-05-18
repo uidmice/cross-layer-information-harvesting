@@ -25,23 +25,23 @@ class Simulation:
         self.channel_nodes = {}
         for channel in range(Gateway.NO_CHANNELS):
             self.channel_nodes[channel] = []
-
-        self.environment = environment
         self.app = Application(len(nodes_positions))
         self.server = Server(self.gateways, self.sim_env, self.app)
         self.air_interface = AirInterface(self.sim_env, self.gateways, self.server)
-
+        self.environment = environment
+        self.constructed_field = [0 for i in range(len(nodes_positions))]
+        self.temp_field = []
         for i in range(len(nodes_positions)):
             node = Node(i, EnergyProfile(0.1), LoRaParameters(collision_group[i]),
                                    self.air_interface, self.sim_env, nodes_positions[i], False)
             self.channel_nodes[collision_group[i]].append(i)
             node.last_payload_sent = self.environment.sense(i, 0)
+            self.constructed_field[i] = self.environment.sense(i, 0)
             self.nodes.append(node)
+        self.app.app_init(self.constructed_field)
+
         for i in range(len(gateway_positions)):
             self.gateways.append(Gateway(i, gateway_positions[i], self.sim_env))
-
-        self.constructed_field = []
-        self.temp_field = []
 
         self.status = {'total_transmission': 0, 'successful_transmission' : 0}
 
@@ -53,7 +53,7 @@ class Simulation:
     def step(self, actions):
         assert len(self.nodes) == len(actions)
         assert self.sim_env.now == self.steps * self.step_time
-        self.constructed_field = self.field_reconstruction()
+
         self.temp_field = self.environment.field(self.sim_env.now)
         self.steps += 1
         send_index = [idx for idx, send in enumerate(actions) if send]
@@ -64,6 +64,7 @@ class Simulation:
         for i in send_index:
             if self.nodes[i].packet_to_send.received:
                 received.append(i)
+        self.constructed_field = self.field_reconstruction()
         return send_index, received
 
     def _node_send_sensed_value(self, node_index, send):
