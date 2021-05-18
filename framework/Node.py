@@ -1,6 +1,6 @@
 from collections import deque
 
-from config import *
+from setup import *
 from .TransmissionInterface import AirInterface
 from .LoRaParameters import LoRaParameters
 from .utils import NodeStates, airtime
@@ -185,7 +185,7 @@ class Node:
 
 
     def sense(self, environment):
-        value = environment.sense(self.location, self.sim_env.now)
+        value = environment.sense(self.id, self.sim_env.now)
         self.sensed_history[self.sim_env.now] = value
         self.latest_sensed = value
         return value

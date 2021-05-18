@@ -6,13 +6,35 @@ import pickle
 from config import *
 from matplotlib.animation import FuncAnimation
 from scipy import interpolate
-import naturalneighbor
+
+def load_field(name):
+    try:
+        field = np.loadtxt('config/'+name+'/env.txt')
+    except Exception as e:
+        raise ValueError(f"Field {name} not found:{str(e)}")
+    return [(n[0], n[1]) for n in field]
 
 def load_config(name):
     try:
-        config = np.loadtxt('config/'+name+'/topology.txt')
+        config = np.loadtxt('config/'+name+'/topology.txt').astype(int)
     except Exception as e:
         raise ValueError(f"Config {name} not found:{str(e)}")
+
+    gateway_locations = []
+    node_locations = []
+    info_group = []
+    collision_group = []
+
+    for n in config:
+        if n[0] == 0:
+            gateway_locations.append(Location(n[2], n[3]))
+        else:
+            info_group.append(n[0])
+            collision_group.append(n[1])
+            node_locations.append(Location(n[2], n[3]))
+    return node_locations, gateway_locations, info_group, collision_group
+
+
 def decimation(Z, n=2):
     N = Z.shape[0]//n
     rt = np.zeros((N, N))
@@ -36,11 +58,7 @@ def extend_field(X, Y, Z, distance):
     Zp = np.concatenate((Z, np.tile(Z[xmin_idx] , 3), np.tile(Z[xmax_idx], 3), np.tile(Z[ymin_idx] , 3), np.tile(Z[ymax_idx], 3)))
     return Xp, Yp, Zp
 
-def natural_neighbor_interpolation(X, Y, Z, distance):
-    Xp, Yp, Zp = extend_field(X, Y, Z, distance)
-    points = np.array([Xp, Yp, np.zeros(Xp.shape)]).T
-    range = [[-distance, distance+1, GRID],[-distance, distance+1, GRID],[0,1,1]]
-    return naturalneighbor.griddata(points, Zp, range).reshape((distance * 2//GRID + 1, distance * 2//GRID + 1))
+
 
 def griddata_interpolate(X, Y, Z, xx, yy,distance, method='cubic'):
     Xp, Yp, Zp = extend_field(X, Y, Z, distance)
@@ -179,15 +197,6 @@ def field_construct_data(simulation, num_steps, time_step, policy, save=False, s
     if save:
         save_field_video(Z, Tr, name, time_step, scale)
 
-
-
-def load_config(name):
-    try:
-        a, b, c, d = pickle.load(open('./config/'+name + '.pickle','rb') )
-        return a, b, c, d
-    except:
-        print(name + ".pickle does not exist")
-        return pickle.load(open('./config/config1.pickle','rb') )
 
 def airtime(sf, bw, cr, h, de, pl):
     Npream = 8  # number of preamble symbol (12.25  from Utz paper)

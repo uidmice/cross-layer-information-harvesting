@@ -5,7 +5,7 @@ class LoRaParameters:
     CHANNELS = range(902300000, 915000000, 200000)
     TP_DBM = range(0, 22)
 
-    def __init__(self, channel, sf=12, tp=15, cr=1,bw = 125):
+    def __init__(self, channel, sf=9, tp=15, cr=1,bw = 125):
         assert (bw == 125), "Only 125kHz bandwidth is supported"
         assert (sf  in LoRaParameters.SPREADING_FACTORS), "SF needs to be between [7, 12]"
         assert (channel in range(len(LoRaParameters.CHANNELS))), "Channel needs to be between [0, 63]"

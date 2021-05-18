@@ -1,21 +1,25 @@
 import numpy as np
-from config import *
+from setup import *
 from collections import deque
 
 from .Gateway import DownlinkPacket, PacketStatus, Gateway
 from .LoRaParameters import LoRaParameters
 from .Node import NodeStates
 from .utils import PacketInformation
-from .FieldReconstruction import FieldReconstructor
 
 class Application:
-    def __init__(self, node_ids, connection, field_update):
-        self.fusion_center = FieldReconstructor(node_ids, connection, field_update)
+    def __init__(self, num_nodes):
+        self.record = {}
+        for i in range(num_nodes):
+            self.record[i] = [0]
 
     def run(self, info):
         temp = info.payload['value']
-        time = info.payload['time']
-        self.fusion_center.update(info.node_id, temp, time)
+        self.record[info.node_id].append(temp)
+
+    def predict(self):
+        return [self.record[i][-1] for i in self.record]
+
 
 
     def reset(self):
