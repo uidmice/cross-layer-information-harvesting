@@ -14,7 +14,7 @@ class Simulation:
     def __init__(self, nodes_positions, gateway_positions, info_group, collision_group, step_time, environment: Environment, num_steps, offset=2000):
         self.nodes = []
         self.gateways = []
-        assert step_time >= offset + 1500
+        assert step_time >= offset + 500
         self.step_time = step_time
         self.offset = offset
         self.steps = 0
@@ -73,6 +73,7 @@ class Simulation:
         yield self.sim_env.timeout(np.random.randint(self.offset))
         if send:
             packet = node.create_unique_packet({'value':value, 'time': time}, False, False)
+            packet.airtime(500)
             yield self.sim_env.process(node.send(packet))
         yield self.sim_env.timeout(self.step_time * self.steps - self.sim_env.now)
 

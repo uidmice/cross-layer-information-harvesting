@@ -1,3 +1,4 @@
+import numpy as np
 
 class Local_Field:
     def __init__(self, b, k = 0):
@@ -18,6 +19,6 @@ class Environment:
         return self.local_fields[node_id].sense(time)
 
     def field(self, time):
-        return [self.local_fields[i].sense(time) for i in range(len(self.local_fields))]
+        return np.array([self.local_fields[i].sense(time) for i in range(len(self.local_fields))])
 
 

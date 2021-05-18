@@ -51,7 +51,6 @@ class Gateway:
                         if packet.status == PacketStatus.OK:
                             if packet.parameter.sf == re.parameter.sf and  packet.parameter.channel == re.parameter.channel and packet.rss - re.rss  < 10:
                                 packet.status = PacketStatus.COLLIDED
-                                print(str(packet.packet_id) + ' collide with ' + str(re.packet_id))
                                 packet.dispatch.succeed(value={self.id: packet})
         self.record.append(re)
         self.receiving.append(re)

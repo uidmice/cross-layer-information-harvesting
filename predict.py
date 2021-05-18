@@ -11,8 +11,8 @@ from framework.Gateway import  Gateway
 DEBUG = False
 
 num_steps = 1000
-step_time = 2500  # ms
-offset = 1000
+step_time = 1000  # ms
+offset = 500
 config = 'simple1'
 
 node_locations, gateway_locations, info_group, collision_group = load_config(config)
@@ -20,7 +20,7 @@ field_para = load_field(config)
 simulation = Simulation(node_locations, gateway_locations, info_group, collision_group, step_time, Environment(field_para), num_steps, offset=offset)
 
 repeat = 5
-random_para = np.arange(0.05, 0.5, 0.05)
+random_para = np.arange(0.5, 1.1, 0.1)
 
 for j, prob in enumerate(random_para):
     print("Probability: "+ str(prob))

@@ -18,8 +18,7 @@ class Application:
         self.record[info.node_id].append(temp)
 
     def predict(self):
-        return [self.record[i][-1] for i in self.record]
-
+        return np.array([self.record[i][-1] for i in self.record])
 
 
     def reset(self):
@@ -49,7 +48,7 @@ class Server:
         ret = yield self.sim_env.all_of(dispatch)
         ret = {k: v for d in ret.values() for k, v in d.items()}
         info = PacketInformation(p.id, p.node.id, p.payload, p.payload_size)
-        print("Packet %d start at %f ends at %f" %(p.id, p.start_at, p.end_at))
+        # print("Packet %d start at %f ends at %f" %(p.id, p.start_at, p.end_at))
         for gateway_id, packet_record in ret.items():
             info.snr[gateway_id] = packet_record.snr
             info.status[gateway_id] = packet_record.status
@@ -62,7 +61,7 @@ class Server:
 
         dl = None
         if any([a==PacketStatus.OK for a in info.status.values()]):
-            print(str(p) + "successfully received")
+            # print(str(p) + "successfully received")
             self.packet_num_received_from[p.node.id] += 1
             dl = DownlinkPacket()
             p.received = True
